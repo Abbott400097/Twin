@@ -122,8 +122,8 @@ def search_memories(query, limit=5):
     return raw if isinstance(raw, list) else []
 
 # ───── 通知 ─────
-def send_notification(title, message):
-    notification.notify(title=title, message=message, app_name="Private AI Twin", timeout=10)
+def send_notification(title, msg):
+    notification.notify(title=title, message=msg, app_name="Private AI Twin", timeout=10)
 
 # ───── 智能提醒 ─────
 def reminder_loop():
@@ -161,7 +161,7 @@ def daily_summary():
                 )
                 summary = response["message"]["content"]
                 memory.add(
-                    messages=f"每日总结（{now.date()}）：{summary}",
+                    messages=[{"role": "user", "content": f"每日总结（{now.date()}）：{summary}"}],
                     user_id=USER_ID,
                     metadata={"type": "daily_summary", "date": str(now.date())}
                 )
@@ -218,11 +218,18 @@ def chat_with_ai(message, history):
         def save_memory():
             try:
                 result = memory.add(
-                    messages=f"user: {message}\nai: {ai_reply}",
+                    messages=[
+                        {"role": "user", "content": message},
+                        {"role": "assistant", "content": ai_reply}
+                    ],
                     user_id=USER_ID,
                     metadata={"timestamp": str(datetime.now())}
                 )
-                print(f"[记忆] 存储成功：{result}")
+                results = result.get("results", []) if isinstance(result, dict) else []
+                if results:
+                    print(f"[记忆] 存储成功，提取到 {len(results)} 条：{[r.get('memory','') for r in results]}")
+                else:
+                    print("[记忆] 调用成功但未提取到新记忆（内容可能不够具体）")
             except Exception as e:
                 print(f"[记忆] 存储失败：{e}")
 
