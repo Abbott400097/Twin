@@ -1,0 +1,4 @@
+qdrant_db/
+docs/
+__pycache__/
+*.pyc
