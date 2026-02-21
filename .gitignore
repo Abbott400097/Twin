@@ -1,4 +1,6 @@
 qdrant_db/
 docs/
+user_config.json
 __pycache__/
 *.pyc
+.env
