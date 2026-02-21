@@ -158,12 +158,17 @@ def chat_with_ai(message, history):
         )
         ai_reply = response["message"]["content"]
 
-        memory.add(
-            messages=f"user: {message}\nai: {ai_reply}",
-            user_id="bingxi",
-            metadata={"timestamp": str(datetime.now())}
-        )
+        ai_reply = response["message"]["content"]
+
+        def save_memory():
+            memory.add(
+                messages=f"user: {message}\nai: {ai_reply}",
+                user_id="bingxi",
+                metadata={"timestamp": str(datetime.now())}
+            )
+        threading.Thread(target=save_memory, daemon=True).start()
         return ai_reply
+
     except Exception as e:
         return f"error: {str(e)}"
 
